@@ -17,7 +17,7 @@ Then on your host PC, open powershell and run the following command:
 ```bash
 ssh -L 8080:localhost:8080 user@<vm-ip>
 ```
-The VM IP is your master node's IP since you run the port-forward command there.  
+The vm-ip is your master node's IP since you run the port-forward command there.  
 
 <br>
 
