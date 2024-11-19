@@ -8,7 +8,7 @@ Run the following command to forward argocd-server's 443 port to VMs 8080 port:
 ```bash
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 ```
-If you get port already in use error you can try 8000 instead of 8080.
+If you get "port already in use" error you can try 8000 instead of 8080.
 
 Don't end this process while you're accessing to UI.  
 <br>
