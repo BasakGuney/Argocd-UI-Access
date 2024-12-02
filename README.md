@@ -56,10 +56,17 @@ Keep in mind the port number, we will use it.
 
 <br>
 
-Run the following command the learn your master node's IP:
+Run the following command the learn the node where argocd works:
 ```bash
- kubectl get nodes -o wide
+ kubectl get pods -n argocd -o wide
 ```
+Remember the node name.
+
+Run the follwing command and look for the IP of that node.
+```bash
+kubectl get nodes -o wide
+```
+
 You can see it under INTERNAL-IP.
 
 Then go to the browser on your host PC and type following:
@@ -68,6 +75,26 @@ http://<node-ip>:<node-port>
 ```
 
 Now, you have to be able view Argocd UI.
+
+## Changing argocd-secret
+Sometimes you can encounter login issues with argocd even you give corret usrname and password.
+In this situation you can regenerate argocd-secret:
+
+1. Delete the existing argocd-secret by:
+```bash
+kubectl delete secret argocd-secret
+```
+2. Generate a new bcrypt-encrypted admin password.
+```bash
+NEW_PASSWORD=$(htpasswd -nbBC 10 "" <new-password> | tr -d ':\n' | sed 's/^$2y/$2a/')
+```
+3. Create a secret with new password.
+```bash
+kubectl create secret generic argocd-secret \
+  --from-literal=admin.password="$NEW_PASSWORD" \
+  --from-literal=admin.passwordMtime="$(date +%FT%T%Z)"
+
+```
 
 
 
