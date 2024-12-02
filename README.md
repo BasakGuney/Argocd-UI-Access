@@ -1,10 +1,7 @@
-# Argocd UI Access
-## Assumptions
-> We assume that you have installed argocd on your Rocky9 VM. Since your VM doesn't have UI you want to access Argocd UI from your host PC by using web browser.
+### ArgoCD UI Login
+####  Option 1 - Port Forwarding
 
-## Option 1 - Port Forwarding
-
-Run the following command to forward argocd-server's 443 port to VMs 8080 port:
+Run the following command to forward argocd-server's 443 port to server machine's 8080 port:
 ```bash
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 ```
@@ -15,13 +12,13 @@ Don't end this process while you're accessing to UI.
 
 Then on your host PC, open powershell and run the following command:
 ```bash
-ssh -L 8080:localhost:8080 user@<vm-ip>
+ssh -L 8080:localhost:8080 user@<server-machine-ip>
 ```
-The vm-ip is your master node's IP since you run the port-forward command there.  
+The server-machine-ip is your master node's IP since you run the port-forward command there.  
 
 <br>
 
-After this you can acces your VM's 8080 port from your host PC's 8080 port. Go to the web browser on your host PC and type following:
+After this you can acces your server machine's 8080 port from your host PC's 8080 port. Go to the web browser on your host PC and type following:
 ```txt
 http://localhost:8080
 ```
@@ -39,7 +36,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 ```
 
 
-## Option 2 - Node Port
+#### Option 2 - Node Port
 You can open your node to an external access by using NodePort services. To enable it,
 
 ```bash
@@ -67,17 +64,23 @@ Run the follwing command and look for the IP of that node.
 kubectl get nodes -o wide
 ```
 
-You can see it under INTERNAL-IP.
-
 Then go to the browser on your host PC and type following:
 ```txt
 http://<node-ip>:<node-port>
 ```
-
 Now, you have to be able view Argocd UI.
 
-## Changing argocd-secret
-Sometimes you can encounter login issues with argocd even you give corret usrname and password.
+Default username:
+```txt
+admin
+```
+Password:  
+Run the following command to get your password
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode ; echo
+```
+#### Changing argocd-secret
+Sometimes you can encounter login issues with argocd even you give correct usrname and password.
 In this situation you can regenerate argocd-secret:
 
 1. Delete the existing argocd-secret by:
@@ -93,8 +96,4 @@ NEW_PASSWORD=$(htpasswd -nbBC 10 "" <new-password> | tr -d ':\n' | sed 's/^$2y/$
 kubectl create secret generic argocd-secret \
   --from-literal=admin.password="$NEW_PASSWORD" \
   --from-literal=admin.passwordMtime="$(date +%FT%T%Z)"
-
-```
-
-
 
